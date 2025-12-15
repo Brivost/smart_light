@@ -1,6 +1,6 @@
 #******************************************************************************
 #
-# Makefile - Build script for smart_fan project
+# Makefile - Build script for smart_light project
 #
 #******************************************************************************
 
@@ -22,8 +22,8 @@ SVL_UPLOAD_BAUD ?= 115200
 PYTHON3 ?= python3
 
 # Project Settings
-TARGET := smart_fan
-PROJECT := smart_fan_gcc
+TARGET := smart_light
+PROJECT := smart_light_gcc
 COMPILERNAME := gcc
 
 #******************************************************************************

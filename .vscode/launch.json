@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/Brian/Documents/smart_fan",
-      "program": "/Users/Brian/Documents/smart_fan/build/Debug/outDebug"
+      "cwd": "/Users/Brian/Documents/smart_light",
+      "program": "/Users/Brian/Documents/smart_light/build/Debug/outDebug"
     }
   ]
 }

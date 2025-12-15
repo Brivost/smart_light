@@ -1,3 +1,10 @@
+Added Sparkfun's version of AmbiqSuiteSDK as submodule:
+```zsh
+git submodule add https://github.com/sparkfun/AmbiqSuiteSDK.git external/AmbiqSuiteSDK
+
+git submodule update --init --recursive
+```
+
 Successfully uploaded firmware using these commands:
 
 ```zsh

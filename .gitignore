@@ -1,0 +1,32 @@
+# Python virtual environment
+venv/
+.venv/
+.venv*/
+__pycache__/
+*.pyc
+*.pyo
+.python-version.lock
+
+# Note: uv.lock is tracked for reproducible builds
+# Uncomment to ignore it:
+# uv.lock
+
+# Build artifacts
+build/
+*.o
+*.axf
+*.bin
+*.map
+*.elf
+
+# IDE
+.vscode/ipch/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+*.log
+

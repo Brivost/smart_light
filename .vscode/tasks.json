@@ -1,0 +1,49 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Firmware",
+            "type": "shell",
+            "command": "make",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Build the firmware binary"
+        },
+        {
+            "label": "Clean Build",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "problemMatcher": [],
+            "detail": "Clean build artifacts"
+        },
+        {
+            "label": "Flash Firmware",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "flash"
+            ],
+            "problemMatcher": [],
+            "detail": "Flash firmware to Artemis ATP board"
+        },
+        {
+            "label": "Build and Flash",
+            "dependsOn": [
+                "Build Firmware",
+                "Flash Firmware"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "detail": "Build and flash firmware in one step"
+        }
+    ]
+}

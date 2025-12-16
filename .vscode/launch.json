@@ -2,12 +2,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "J-Link Debug (Artemis)",
+      "cwd": "${workspaceRoot}",
+      "executable": "./build/smart_light.axf",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "jlink",
+      "device": "AMA3B1KK-KBR",
+      "interface": "swd",
+      "runToEntryPoint": "main",
+      "svdFile": "${workspaceFolder}/external/AmbiqSuiteSDK/mcu/apollo3/regs/apollo3.svd"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/Brian/Documents/smart_light",
-      "program": "/Users/Brian/Documents/smart_light/build/Debug/outDebug"
+      "cwd": "/Users/Brian/Documents/smart_light/src",
+      "program": "/Users/Brian/Documents/smart_light/src/build/Debug/outDebug"
     }
   ]
 }

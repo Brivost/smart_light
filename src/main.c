@@ -33,7 +33,61 @@ SOFTWARE.
 #include "am_mcu_apollo.h"
 #include "am_util.h"
 
-#define BLINK_PERIOD 100
+#define BLINK_PERIOD 500
+
+#define PERIPHERAL_BASE (0x40000000)
+
+// Pad configuration register
+#define PADREGB_OFFSET (0x00010004)
+#define PADREGB (*(volatile uint32_t *)(PADREGB_OFFSET + PERIPHERAL_BASE))
+
+// AltPad configuration register
+#define ALTPADREGB_OFFSET (0x000100E4)
+#define ALTPADREGB (*(volatile uint32_t *)(ALTPADREGB_OFFSET + PERIPHERAL_BASE))
+
+// GPIO configuration register
+#define CFGA_OFFSET (0x00010040)
+#define CFGA (*(volatile uint32_t *)(CFGA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO Output Register
+#define WTA_OFFSET (0x00010088)
+#define WTA (*(volatile uint32_t *)(WTA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO output set register
+#define WTSA_OFFSET (0x00010090)
+#define WTSA (*(volatile uint32_t *)(WTSA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO output clear register
+#define WTCA_OFFSET (0x0001009C)
+#define WTCA (*(volatile uint32_t *)(WTCA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO output enable register
+#define ENA_OFFSET (0x000100A0)
+#define ENA (*(volatile uint32_t *)(ENA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO output enable set register
+#define ENSA_OFFSET (0x000100A8)
+#define ENSA (*(volatile uint32_t *)(ENSA_OFFSET + PERIPHERAL_BASE))
+
+// GPIO output enable clear register
+#define ENCA_OFFSET (0x000100B4)
+#define ENCA (*(volatile uint32_t *)(ENCA_OFFSET + PERIPHERAL_BASE))
+
+// Pad key register
+#define PADKEY_OFFSET (0x00010060)
+#define PADKEY (*(volatile uint32_t *)(PERIPHERAL_BASE + PADKEY_OFFSET))
+
+/*
+ * Steps for using GPIO
+ * 1. Set PADKEY to 0x73 in order to write the PADREGB register
+ * 2. Configure pad as GPIO by setting bits 13:11 (the PADnFNCSEL field) of PADREGB to 0x3 (011)
+ * 4. Configure GPIO as output by setting bits 22:21 of CFGA as 0x3 for push-pull mode
+ * 3. Set GPIO drive strength to 2mA by setting bit 8 of ALTPADREGB to 0 and bit 10 of PADREGB to 0
+ * 4. Clear PADKEY by setting it to 0x00
+ * 5. Enable GPIO by setting bit 5 ENA to 1
+ * 6. To turn LED off, set bit 5 of WTCA to 1
+ * 7. To turn LED on, set bit 5 of WTSA to 1
+ */
 
 //*****************************************************************************
 //
@@ -51,31 +105,38 @@ int main(void) {
     // Configure the board for low power operation.
     am_bsp_low_power_init();
 
-    // Set up BSP leds
-#ifdef AM_BSP_NUM_LEDS
-    uint32_t ux, ui32GPIONumber;
-    for (ux = 0; ux < AM_BSP_NUM_LEDS; ux++) {
-        ui32GPIONumber = am_bsp_psLEDs[ux].ui32GPIONumber;
-        am_hal_gpio_pinconfig(ui32GPIONumber, g_AM_HAL_GPIO_OUTPUT);
-        am_devices_led_off(am_bsp_psLEDs, ux);
-    }
-#endif  // AM_BSP_NUM_LEDS
+    // Set PADKEY
+    PADKEY = 0x73;
 
-    bool led_state = false;
+    // Clear bits 13:11 of PADREGB
+    PADREGB &= ~(0x7u << 11);
+    // Set bits 13:11 to 0x3
+    PADREGB |= (0x3u << 11);
 
-    // Blink forever
+    // Clear bits 22:21 of CFGA
+    CFGA &= ~(0x3u << 21);
+    // Set bits 22:21 to 0x3
+    CFGA |= (0x3u << 21);
+
+    // Set bit 10 to 0 of PADREGB
+    PADREGB &= ~(0x1u << 10);
+
+    // Set bit 8 to 0 of ALTPADREGB
+    ALTPADREGB &= ~(0x1u << 8);
+
+    // Clear PADKEY
+    PADKEY = 0;
+
+    // Set bit 5 of ENA to 1
+    ENA |= (0x1u << 5);
+
+    // Set bit 5 of WTA to 0
+    WTA &= ~(0x1u << 5);
+
+    // Main loop - toggle LED forever
     while (1) {
-        // Toggle LEDs
-#ifdef AM_BSP_NUM_LEDS
-        led_state = !led_state;
-        uint32_t ux;
-        for (ux = 0; ux < AM_BSP_NUM_LEDS; ux++) {
-            ui32GPIONumber = am_bsp_psLEDs[ux].ui32GPIONumber;
-            (led_state) ? am_devices_led_on(am_bsp_psLEDs, ux) : am_devices_led_off(am_bsp_psLEDs, ux);
-        }
-#endif  // AM_BSP_NUM_LEDS
-
-        // Delay
+        // Toggle bit 5 of WTA
+        WTA ^= (0x1u << 5);
         am_util_delay_ms(BLINK_PERIOD);
     }
 }

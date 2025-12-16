@@ -85,8 +85,8 @@ SOFTWARE.
  * 3. Set GPIO drive strength to 2mA by setting bit 8 of ALTPADREGB to 0 and bit 10 of PADREGB to 0
  * 4. Clear PADKEY by setting it to 0x00
  * 5. Enable GPIO by setting bit 5 ENA to 1
- * 6. To turn LED off, set bit 5 of WTCA to 1
- * 7. To turn LED on, set bit 5 of WTSA to 1
+ * 6. To turn LED off, set bit 5 of WTA to 0
+ * 7. To turn LED on, set bit 5 of WTA to 1
  */
 
 //*****************************************************************************

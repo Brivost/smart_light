@@ -5,6 +5,12 @@
       "includePath": [
         "${workspaceFolder}/**"
       ],
+      // from Makefile defines
+      "defines": [
+        "PART_apollo3",
+        "AM_PACKAGE_BGA",
+        "AM_PART_APOLLO3"
+      ],
       "compilerPath": "/usr/bin/clang",
       "cStandard": "${default}",
       "cppStandard": "${default}",

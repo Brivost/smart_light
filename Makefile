@@ -62,6 +62,7 @@ SRC += am_util_delay.c
 SRC += am_util_faultisr.c
 SRC += am_util_stdio.c
 SRC += am_devices_led.c
+SRC += am_util_id.c
 
 # Source Paths (VPATH tells make where to find source files)
 VPATH := src

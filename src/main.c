@@ -64,6 +64,7 @@ void *phUART;
     if ((x) != AM_HAL_STATUS_SUCCESS) { \
         error_handler(x);               \
     }
+#define BLINK_PERIOD 100
 
 volatile uint32_t ui32LastError;
 
@@ -301,13 +302,19 @@ int main(void) {
     am_hal_uart_tx_flush(phUART);
     CHECK_ERRORS(am_hal_uart_power_control(phUART, AM_HAL_SYSCTRL_DEEPSLEEP, false));
 
+    // Set up LED
+    uint32_t ui32GPIONumber = am_bsp_psLEDs[0].ui32GPIONumber;
+    am_hal_gpio_pinconfig(ui32GPIONumber, g_AM_HAL_GPIO_OUTPUT);
+    am_devices_led_off(am_bsp_psLEDs, 0);
+    bool led_state = false;
+
     //
-    // Loop forever while sleeping.
+    // Loop forever
     //
     while (1) {
-        //
-        // Go to Deep Sleep.
-        //
-        am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
+        led_state = !led_state;
+        ui32GPIONumber = am_bsp_psLEDs[0].ui32GPIONumber;
+        (led_state) ? am_devices_led_on(am_bsp_psLEDs, 0) : am_devices_led_off(am_bsp_psLEDs, 0);
+        am_util_delay_ms(BLINK_PERIOD);
     }
 }

@@ -52,7 +52,7 @@ void process_command(const uint8_t data) {
             uart.printf("Turning LED off\n");
             break;
         default:
-            uart.printf("Unrecognized command. Enter 'y' or 'n'.\n");
+            uart.printf("Unrecognized command %d. Enter 'y' or 'n'.\n", data);
             break;
     }
 }
@@ -84,7 +84,5 @@ int main() {
         if (num_bytes > 0) {
             process_command(uart.read());
         }
-        // uart.printf("Waiting");
-        // am_util_delay_ms(1000);
     }
 }

@@ -25,9 +25,10 @@ class Uart {
    private:
     void *_handle;
     am_hal_uart_config_t _config;
+    // TODO : Make RingBuffers
     uint8_t _tx_buff[BUFF_SIZE];
     uint8_t _rx_buff[BUFF_SIZE];
-    uint8_t _rx_idx = 0;
+    int _rx_idx = 0;
     volatile uint32_t _tx_idle;
 };
 

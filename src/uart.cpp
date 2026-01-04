@@ -16,8 +16,8 @@ void Uart::begin(uint32_t baudrate) {
         .ui32FifoLevels = (AM_HAL_UART_TX_FIFO_1_2 | AM_HAL_UART_RX_FIFO_1_2),
         .pui8TxBuffer = _tx_buff,
         .ui32TxBufferSize = sizeof(_tx_buff),
-        .pui8RxBuffer = _rx_buff,
-        .ui32RxBufferSize = sizeof(_rx_buff),
+        .pui8RxBuffer = nullptr,  // Handle reading FIFO in ISR
+        .ui32RxBufferSize = 0,
     };
 
     // Initialize Uart
@@ -75,7 +75,13 @@ int Uart::read() {
     int ret_byte;
 
     NVIC_DisableIRQ((IRQn_Type)(UART0_IRQn));
-    ret_byte = _rx_buff[_rx_idx];
+    ret_byte = _rx_buff[_rx_idx - 1];
+    // Shift remaining data to front of buffer
+    int remaining{_rx_idx - 1};
+    for (int i{}; i < remaining; ++i) {
+        _rx_buff[i] = _rx_buff[1 + i];
+    }
+    _rx_idx = remaining;
     NVIC_EnableIRQ((IRQn_Type)(UART0_IRQn));
 
     return ret_byte;
@@ -175,7 +181,7 @@ void Uart::uart_isr() {
         am_hal_uart_transfer(_handle, &sRead);
 
         for (uint32_t i{}; i < ui32BytesRead; ++i) {
-            _rx_buff[i + _rx_idx] = rx_chunk[i];
+            _rx_buff[_rx_idx] = rx_chunk[i];
             ++_rx_idx;
         }
     }

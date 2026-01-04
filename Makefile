@@ -65,39 +65,39 @@ SRC += am_devices_led.c
 SRC += am_util_id.c
 SRC += uart.cpp
 # for debugging hal
-SRC += am_hal_adc.c
-SRC += am_hal_ble.c
-SRC += am_hal_ble_patch.c
-SRC += am_hal_ble_patch_b0.c
-SRC += am_hal_burst.c
-SRC += am_hal_cachectrl.c
-SRC += am_hal_clkgen.c
-SRC += am_hal_cmdq.c
-SRC += am_hal_ctimer.c
-SRC += am_hal_debug.c
-SRC += am_hal_flash.c
-SRC += am_hal_global.c
-SRC += am_hal_gpio.c
-SRC += am_hal_interrupt.c
-SRC += am_hal_iom.c
-SRC += am_hal_ios.c
-SRC += am_hal_itm.c
-SRC += am_hal_mcuctrl.c
-SRC += am_hal_mspi.c
-SRC += am_hal_pdm.c
-SRC += am_hal_pwrctrl.c
-SRC += am_hal_queue.c
-SRC += am_hal_reset.c
-SRC += am_hal_rtc.c
-SRC += am_hal_scard.c
-SRC += am_hal_secure_ota.c
-SRC += am_hal_security.c
-SRC += am_hal_stimer.c
-SRC += am_hal_sysctrl.c
-SRC += am_hal_systick.c
-SRC += am_hal_tpiu.c
-SRC += am_hal_uart.c
-SRC += am_hal_wdt.c
+# SRC += am_hal_adc.c
+# SRC += am_hal_ble.c
+# SRC += am_hal_ble_patch.c
+# SRC += am_hal_ble_patch_b0.c
+# SRC += am_hal_burst.c
+# SRC += am_hal_cachectrl.c
+# SRC += am_hal_clkgen.c
+# SRC += am_hal_cmdq.c
+# SRC += am_hal_ctimer.c
+# SRC += am_hal_debug.c
+# SRC += am_hal_flash.c
+# SRC += am_hal_global.c
+# SRC += am_hal_gpio.c
+# SRC += am_hal_interrupt.c
+# SRC += am_hal_iom.c
+# SRC += am_hal_ios.c
+# SRC += am_hal_itm.c
+# SRC += am_hal_mcuctrl.c
+# SRC += am_hal_mspi.c
+# SRC += am_hal_pdm.c
+# SRC += am_hal_pwrctrl.c
+# SRC += am_hal_queue.c
+# SRC += am_hal_reset.c
+# SRC += am_hal_rtc.c
+# SRC += am_hal_scard.c
+# SRC += am_hal_secure_ota.c
+# SRC += am_hal_security.c
+# SRC += am_hal_stimer.c
+# SRC += am_hal_sysctrl.c
+# SRC += am_hal_systick.c
+# SRC += am_hal_tpiu.c
+# SRC += am_hal_uart.c
+# SRC += am_hal_wdt.c
 
 # Source Paths (VPATH tells make where to find source files)
 VPATH := src
@@ -105,12 +105,12 @@ VPATH += $(SDKPATH)/utils
 VPATH += $(SDKPATH)/devices
 VPATH += $(COMMONPATH)/tools_sfe/templates
 # for debugging hal
-VPATH += $(SDKPATH)/mcu/apollo3/hal
+# VPATH += $(SDKPATH)/mcu/apollo3/hal
 
 # Precompiled Libraries
 LIBS := $(BOARDPATH)/bsp/gcc/bin/libam_bsp.a
 # comment out if compiling hal from source for debugging
-# LIBS += $(SDKPATH)/mcu/apollo3/hal/gcc/bin/libam_hal.a
+LIBS += $(SDKPATH)/mcu/apollo3/hal/gcc/bin/libam_hal.a
 
 #******************************************************************************
 # Compiler and Linker Configuration

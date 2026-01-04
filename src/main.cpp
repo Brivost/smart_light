@@ -45,14 +45,14 @@ void process_command(const uint8_t data) {
     switch (data) {
         case 'y':
             led_on();
-            uart.printf("Turning LED on\n");
+            Serial.printf("Turning LED on\n");
             break;
         case 'n':
             led_off();
-            uart.printf("Turning LED off\n");
+            Serial.printf("Turning LED off\n");
             break;
         default:
-            uart.printf("Unrecognized command %d. Enter 'y' or 'n'.\n", data);
+            Serial.printf("Unrecognized command %d. Enter 'y' or 'n'.\n", data);
             break;
     }
 }
@@ -61,28 +61,28 @@ void print_device_info() {
     am_util_id_t id;
     am_util_id_device(&id);
 
-    uart.printf("Hello World this is a very super long string that I am trying to print!\n\n");
-    uart.printf("Vendor: %s\n", id.pui8VendorName);
-    uart.printf("0123456789\n");
-    uart.printf("Device: %s\n", id.pui8DeviceName);
-    uart.printf("Chip ID: 0x%08X\n", id.sMcuCtrlDevice.ui32ChipID0);
-    uart.printf("Revision: Rev%c%c\n", id.ui8ChipRevMaj, id.ui8ChipRevMin);
-    uart.printf("\nEnter 'y' to turn LED on, 'n' to turn LED off.\n");
+    Serial.printf("Hello World this is a very super long string that I am trying to print!\n\n");
+    Serial.printf("Vendor: %s\n", id.pui8VendorName);
+    Serial.printf("0123456789\n");
+    Serial.printf("Device: %s\n", id.pui8DeviceName);
+    Serial.printf("Chip ID: 0x%08X\n", id.sMcuCtrlDevice.ui32ChipID0);
+    Serial.printf("Revision: Rev%c%c\n", id.ui8ChipRevMaj, id.ui8ChipRevMin);
+    Serial.printf("\nEnter 'y' to turn LED on, 'n' to turn LED off.\n");
 }
 
 int main() {
     board_init();
     led_init();
 
-    uart.begin(115200);
+    Serial.begin(115200);
 
     print_device_info();
 
     int num_bytes{};
     while (1) {
-        num_bytes = uart.available();
+        num_bytes = Serial.available();
         if (num_bytes > 0) {
-            process_command(uart.read());
+            process_command(Serial.read());
         }
     }
 }

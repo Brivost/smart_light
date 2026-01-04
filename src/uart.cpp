@@ -189,8 +189,8 @@ void Uart::uart_isr() {
 
 // ISR
 extern "C" void __attribute__((interrupt)) am_uart_isr(void) {
-    uart.uart_isr();
+    Serial.uart_isr();
 }
 
 // Global UART instance
-Uart uart;
+Uart Serial;

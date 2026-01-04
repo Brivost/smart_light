@@ -32,6 +32,6 @@ class Uart {
     volatile uint32_t _tx_idle;
 };
 
-extern Uart uart;
+extern Uart Serial;
 
 #endif  // UART_H

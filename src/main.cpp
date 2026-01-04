@@ -21,6 +21,7 @@ void board_init() {
     am_hal_cachectrl_config(&am_hal_cachectrl_defaults);
     am_hal_cachectrl_enable();
     am_bsp_low_power_init();
+    am_hal_interrupt_master_enable();  // Enable interruts master
 }
 
 void led_init() {

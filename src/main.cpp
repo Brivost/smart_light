@@ -2,10 +2,9 @@
 //
 //! @file main.cpp
 //!
-//! @brief A simple read and write example using UART
+//! @brief Main firmware
 //!
-//! Purpose: Prints device info over UART. Then accepts 'y' or 'n' commands
-//! via UART to turn on or off LED.
+//! Purpose: Main firmware
 //
 //*****************************************************************************
 
@@ -57,31 +56,15 @@ void process_command(const uint8_t data) {
     }
 }
 
-void print_device_info() {
-    am_util_id_t id;
-    am_util_id_device(&id);
-
-    Serial.printf("Hello World this is a very super long string that I am trying to print!\n\n");
-    Serial.printf("Vendor: %s\n", id.pui8VendorName);
-    Serial.printf("0123456789\n");
-    Serial.printf("Device: %s\n", id.pui8DeviceName);
-    Serial.printf("Chip ID: 0x%08X\n", id.sMcuCtrlDevice.ui32ChipID0);
-    Serial.printf("Revision: Rev%c%c\n", id.ui8ChipRevMaj, id.ui8ChipRevMin);
-    Serial.printf("\nEnter 'y' to turn LED on, 'n' to turn LED off.\n");
-}
-
 int main() {
     board_init();
     led_init();
 
     Serial.begin(115200);
 
-    print_device_info();
-
-    int num_bytes{};
+    Serial.printf("\nEnter 'y' to turn LED on, 'n' to turn LED off.\n");
     while (1) {
-        num_bytes = Serial.available();
-        if (num_bytes > 0) {
+        if (Serial.available()) {
             process_command(Serial.read());
         }
     }

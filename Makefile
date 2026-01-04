@@ -63,16 +63,54 @@ SRC += am_util_faultisr.c
 SRC += am_util_stdio.c
 SRC += am_devices_led.c
 SRC += am_util_id.c
+SRC += uart.cpp
+# for debugging hal
+SRC += am_hal_adc.c
+SRC += am_hal_ble.c
+SRC += am_hal_ble_patch.c
+SRC += am_hal_ble_patch_b0.c
+SRC += am_hal_burst.c
+SRC += am_hal_cachectrl.c
+SRC += am_hal_clkgen.c
+SRC += am_hal_cmdq.c
+SRC += am_hal_ctimer.c
+SRC += am_hal_debug.c
+SRC += am_hal_flash.c
+SRC += am_hal_global.c
+SRC += am_hal_gpio.c
+SRC += am_hal_interrupt.c
+SRC += am_hal_iom.c
+SRC += am_hal_ios.c
+SRC += am_hal_itm.c
+SRC += am_hal_mcuctrl.c
+SRC += am_hal_mspi.c
+SRC += am_hal_pdm.c
+SRC += am_hal_pwrctrl.c
+SRC += am_hal_queue.c
+SRC += am_hal_reset.c
+SRC += am_hal_rtc.c
+SRC += am_hal_scard.c
+SRC += am_hal_secure_ota.c
+SRC += am_hal_security.c
+SRC += am_hal_stimer.c
+SRC += am_hal_sysctrl.c
+SRC += am_hal_systick.c
+SRC += am_hal_tpiu.c
+SRC += am_hal_uart.c
+SRC += am_hal_wdt.c
 
 # Source Paths (VPATH tells make where to find source files)
 VPATH := src
 VPATH += $(SDKPATH)/utils
 VPATH += $(SDKPATH)/devices
 VPATH += $(COMMONPATH)/tools_sfe/templates
+# for debugging hal
+VPATH += $(SDKPATH)/mcu/apollo3/hal
 
 # Precompiled Libraries
 LIBS := $(BOARDPATH)/bsp/gcc/bin/libam_bsp.a
-LIBS += $(SDKPATH)/mcu/apollo3/hal/gcc/bin/libam_hal.a
+# comment out if compiling hal from source for debugging
+# LIBS += $(SDKPATH)/mcu/apollo3/hal/gcc/bin/libam_hal.a
 
 #******************************************************************************
 # Compiler and Linker Configuration
@@ -80,22 +118,24 @@ LIBS += $(SDKPATH)/mcu/apollo3/hal/gcc/bin/libam_hal.a
 
 # Executables
 CC := $(TOOLCHAIN)-gcc
-GCC := $(TOOLCHAIN)-gcc
-CPP := $(TOOLCHAIN)-cpp
-LD := $(TOOLCHAIN)-ld
+CXX := $(TOOLCHAIN)-g++
 CP := $(TOOLCHAIN)-objcopy
-OD := $(TOOLCHAIN)-objdump
-AR := $(TOOLCHAIN)-ar
 SIZE := $(TOOLCHAIN)-size
 RM := rm -f
 
-# Compiler Flags
-CFLAGS := -mthumb -mcpu=$(CPU) -mfpu=$(FPU) -mfloat-abi=$(FABI)
-CFLAGS += -ffunction-sections -fdata-sections
-CFLAGS += -MMD -MP -std=c99 -Wall
-CFLAGS += -g -O3
-CFLAGS += $(DEFINES)
-CFLAGS += $(INCLUDES)
+# Common Flags
+COMMON_FLAGS := -mthumb -mcpu=$(CPU) -mfpu=$(FPU) -mfloat-abi=$(FABI)
+COMMON_FLAGS += -ffunction-sections -fdata-sections
+COMMON_FLAGS += -MMD -MP -Wall
+COMMON_FLAGS += -g -O0
+COMMON_FLAGS += $(DEFINES)
+COMMON_FLAGS += $(INCLUDES)
+
+# C Compiler Flags
+CFLAGS := $(COMMON_FLAGS) -std=c99
+
+# C++ Compiler Flags
+CXXFLAGS := $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti
 
 # Linker Script
 LINKER_SCRIPT := $(COMMONPATH)/tools_sfe/templates/asb_svl_linker.ld
@@ -113,8 +153,9 @@ LFLAGS += -Wl,-Map,$(CONFIG)/$(TARGET).map
 
 # Object files
 CSRC := $(filter %.c,$(SRC))
-OBJS := $(CSRC:%.c=$(CONFIG)/%.o)
-DEPS := $(CSRC:%.c=$(CONFIG)/%.d)
+CXXSRC := $(filter %.cpp,$(SRC))
+OBJS := $(CSRC:%.c=$(CONFIG)/%.o) $(CXXSRC:%.cpp=$(CONFIG)/%.o)
+DEPS := $(CSRC:%.c=$(CONFIG)/%.d) $(CXXSRC:%.cpp=$(CONFIG)/%.d)
 
 # Default target
 all: directories $(CONFIG)/$(TARGET).bin
@@ -130,10 +171,15 @@ $(CONFIG)/%.o: %.c
 	@echo "Compiling $<"
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
-# Link
+# Compile C++ files
+$(CONFIG)/%.o: %.cpp
+	@echo "Compiling $<"
+	@$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+# Link (use g++ when mixing C/C++)
 $(CONFIG)/$(TARGET).axf: $(OBJS)
 	@echo "Linking..."
-	@$(CC) -T $(LINKER_SCRIPT) -o $@ $(OBJS) $(LFLAGS)
+	@$(CXX) -T $(LINKER_SCRIPT) -o $@ $(OBJS) $(LFLAGS)
 
 # Create binary
 $(CONFIG)/$(TARGET).bin: $(CONFIG)/$(TARGET).axf

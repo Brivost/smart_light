@@ -56,7 +56,7 @@ INCLUDES += -I$(SDKPATH)/CMSIS/AmbiqMicro/Include
 INCLUDES += -I$(SDKPATH)/CMSIS/ARM/Include
 
 # Source Files
-SRC := main.c
+SRC := main.cpp
 SRC += startup_gcc.c
 SRC += am_util_delay.c
 SRC += am_util_faultisr.c

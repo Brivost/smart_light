@@ -86,8 +86,8 @@ void *PDMHandle;
 am_hal_pdm_config_t g_sPdmConfig =
     {
         .eClkDivider = AM_HAL_PDM_MCLKDIV_1,
-        .eLeftGain = AM_HAL_PDM_GAIN_0DB,
-        .eRightGain = AM_HAL_PDM_GAIN_0DB,
+        .eLeftGain = AM_HAL_PDM_GAIN_P405DB,
+        .eRightGain = AM_HAL_PDM_GAIN_P405DB,
         .ui32DecimationRate = 48,
         .bHighPassEnable = 0,
         .ui32HighPassCutoff = 0xB,
@@ -115,7 +115,7 @@ void pdm_init(void) {
     am_hal_pdm_initialize(0, &PDMHandle);
     am_hal_pdm_power_control(PDMHandle, AM_HAL_PDM_POWER_ON, false);
     am_hal_pdm_configure(PDMHandle, &g_sPdmConfig);
-    am_hal_pdm_enable(PDMHandle);
+    am_hal_pdm_fifo_flush(PDMHandle);
 
     //
     // Configure the necessary pins.
@@ -130,6 +130,7 @@ void pdm_init(void) {
     am_hal_pdm_interrupt_enable(PDMHandle, (AM_HAL_PDM_INT_DERR | AM_HAL_PDM_INT_DCMP | AM_HAL_PDM_INT_UNDFL | AM_HAL_PDM_INT_OVF));
 
     NVIC_EnableIRQ(PDM_IRQn);
+    am_hal_pdm_enable(PDMHandle);
 }
 
 //*****************************************************************************
@@ -219,9 +220,6 @@ void pdm_data_get(void) {
     //
     // Start the data transfer.
     //
-    am_hal_pdm_enable(PDMHandle);
-    am_util_delay_ms(100);
-    am_hal_pdm_fifo_flush(PDMHandle);
     am_hal_pdm_dma_start(PDMHandle, &sTransfer);
 }
 
@@ -248,7 +246,6 @@ extern "C" void am_pdm0_isr(void) {
     // into another buffer.
     //
     if (ui32Status & AM_HAL_PDM_INT_DCMP) {
-        am_hal_pdm_disable(PDMHandle);
         g_bPDMDataReady = true;
     }
 }
@@ -283,6 +280,7 @@ int main(void) {
     am_hal_cachectrl_config(&am_hal_cachectrl_defaults);
     am_hal_cachectrl_enable();
     am_bsp_low_power_init();
+    am_hal_interrupt_master_enable();
 
     //
     // Initialize the printf interface for UART output
@@ -301,31 +299,19 @@ int main(void) {
     //
     pdm_init();
     pdm_config_print();
-    am_hal_pdm_fifo_flush(PDMHandle);
     pdm_data_get();
 
     //
-    // Loop forever while sleeping.
+    // Loop forever
     //
     while (1) {
-        am_hal_interrupt_master_disable();
-
         if (g_bPDMDataReady) {
             g_bPDMDataReady = false;
 
             pcm_print();
 
-            //
             // Start converting the next set of PCM samples.
-            //
             pdm_data_get();
         }
-
-        //
-        // Go to Deep Sleep.
-        //
-        am_hal_sysctrl_sleep(AM_HAL_SYSCTRL_SLEEP_DEEP);
-
-        am_hal_interrupt_master_enable();
     }
 }

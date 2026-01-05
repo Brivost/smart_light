@@ -57,6 +57,7 @@
 #include "am_mcu_apollo.h"
 #include "am_util.h"
 #include "arm_math.h"
+#include "uart.h"
 
 //*****************************************************************************
 //
@@ -205,10 +206,10 @@ void pdm_config_print(void) {
     g_ui32SampleFreq = (ui32PDMClk /
                         (ui32MClkDiv * 2 * g_sPdmConfig.ui32DecimationRate));
 
-    am_util_stdio_printf("Settings:\n");
-    am_util_stdio_printf("PDM Clock (Hz):         %12d\n", ui32PDMClk);
-    am_util_stdio_printf("Decimation Rate:        %12d\n", g_sPdmConfig.ui32DecimationRate);
-    am_util_stdio_printf("Effective Sample Freq.: %12d\n", g_ui32SampleFreq);
+    Serial.printf("Settings:\n");
+    Serial.printf("PDM Clock (Hz):         %12d\n", ui32PDMClk);
+    Serial.printf("Decimation Rate:        %12d\n", g_sPdmConfig.ui32DecimationRate);
+    Serial.printf("Effective Sample Freq.: %12d\n", g_ui32SampleFreq);
 }
 
 //*****************************************************************************
@@ -266,7 +267,7 @@ void pcm_print(void) {
     // Convert the PDM samples to floats
     //
     for (uint32_t i = 0; i < PDM_SIZE; i++) {
-        am_util_stdio_printf("%d\n", pi16PDMData[i]);
+        Serial.printf("%d\n", pi16PDMData[i]);
     }
 }
 
@@ -280,7 +281,7 @@ void pcm_print_all(void) {
     // Convert the PDM samples to floats
     //
     for (int i = 0; i < g_PCMSamplesRecorded; i++) {
-        am_util_stdio_printf("%d\n", g_PCMPrintBuffer[i]);
+        Serial.printf("%d\n", g_PCMPrintBuffer[i]);
     }
 }
 
@@ -300,15 +301,7 @@ int main(void) {
     am_bsp_low_power_init();
     am_hal_interrupt_master_enable();
 
-    //
-    // Initialize the printf interface for UART output
-    //
-    am_bsp_uart_printf_enable();
-
-    //
-    // Print the banner.
-    //
-    am_util_stdio_terminal_clear();
+    Serial.begin(115200);
 
     //
     // Turn on the PDM, set it up for our chosen recording settings, and start

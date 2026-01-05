@@ -67,6 +67,11 @@
 #define PDM_BYTES (PDM_SIZE * 2)
 #define PRINT_PDM_DATA 1
 
+#define PCM_SR 16000
+#define RECORDING_DURATION_SECONDS 5
+// Multiple of PDM_SIZE to ensure whole number of PDM samples are recorded and we do not write past buffer
+#define PRINT_BUFF_SIZE ((PCM_SR * RECORDING_DURATION_SECONDS / PDM_SIZE) * PDM_SIZE)
+
 //*****************************************************************************
 //
 // Global variables.
@@ -74,6 +79,8 @@
 //*****************************************************************************
 volatile bool g_bPDMDataReady = false;
 uint32_t g_ui32PDMDataBuffer[PDM_SIZE];
+int16_t g_PCMPrintBuffer[PRINT_BUFF_SIZE];
+int32_t g_PCMSamplesRecorded{};
 uint32_t g_ui32SampleFreq;
 
 //*****************************************************************************
@@ -238,21 +245,18 @@ extern "C" void am_pdm0_isr(void) {
     am_hal_pdm_interrupt_clear(PDMHandle, ui32Status);
 
     //
-    // Once our DMA transaction completes, we will disable the PDM and send a
-    // flag back down to the main routine. Disabling the PDM is only necessary
-    // because this example only implemented a single buffer for storing FFT
-    // data. More complex programs could use a system of multiple buffers to
-    // allow the CPU to run the FFT in one buffer while the DMA pulls PCM data
-    // into another buffer.
+    // Copy PDM data to print buffer
     //
     if (ui32Status & AM_HAL_PDM_INT_DCMP) {
         g_bPDMDataReady = true;
+        memcpy(g_PCMPrintBuffer + g_PCMSamplesRecorded, (int16_t *)g_ui32PDMDataBuffer, PDM_BYTES);
+        g_PCMSamplesRecorded += PDM_SIZE;
     }
 }
 
 //*****************************************************************************
 //
-// Analyze and print frequency data.
+// Print PCM from single PDM buffer length
 //
 //*****************************************************************************
 void pcm_print(void) {
@@ -263,6 +267,20 @@ void pcm_print(void) {
     //
     for (uint32_t i = 0; i < PDM_SIZE; i++) {
         am_util_stdio_printf("%d\n", pi16PDMData[i]);
+    }
+}
+
+//*****************************************************************************
+//
+// Print PCM from recorded PCM buffer
+//
+//*****************************************************************************
+void pcm_print_all(void) {
+    //
+    // Convert the PDM samples to floats
+    //
+    for (int i = 0; i < g_PCMSamplesRecorded; i++) {
+        am_util_stdio_printf("%d\n", g_PCMPrintBuffer[i]);
     }
 }
 
@@ -291,27 +309,24 @@ int main(void) {
     // Print the banner.
     //
     am_util_stdio_terminal_clear();
-    am_util_stdio_printf("PDM example.\n\n");
 
     //
     // Turn on the PDM, set it up for our chosen recording settings, and start
     // the first DMA transaction.
     //
     pdm_init();
-    pdm_config_print();
     pdm_data_get();
 
     //
     // Loop forever
     //
-    while (1) {
+    while (g_PCMSamplesRecorded + PDM_SIZE <= PRINT_BUFF_SIZE) {
         if (g_bPDMDataReady) {
             g_bPDMDataReady = false;
-
-            pcm_print();
 
             // Start converting the next set of PCM samples.
             pdm_data_get();
         }
     }
+    pcm_print_all();
 }

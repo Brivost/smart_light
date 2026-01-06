@@ -63,14 +63,13 @@ void Pdm::deinit() {
     am_hal_gpio_pinconfig(AM_BSP_PDM_DATA_PIN, g_AM_HAL_GPIO_DISABLE);
     am_hal_gpio_pinconfig(AM_BSP_PDM_CLOCK_PIN, g_AM_HAL_GPIO_DISABLE);
 
-    // This was a workaround code to measure power consumption. Need to review!!
-    am_app_KWD_pdm_dma_disable(_handle);
-
     am_hal_pdm_disable(_handle);
     am_hal_pdm_power_control(_handle, AM_HAL_PDM_POWER_OFF, false);
 
     am_hal_pdm_deinitialize(_handle);
     _handle = nullptr;
+    pdm_handler = nullptr;
+    is_initialized = false;
 }
 
 // Start a transaction to get some number of bytes from the PDM interface.
@@ -100,6 +99,18 @@ int16_t *Pdm::getPrintBuffer() {
     return _PCMPrintBuffer;
 }
 
+am_hal_pdm_config_t *Pdm::getConfig() {
+    return &_config;
+}
+
+bool Pdm::dataIsReady() {
+    return _PDMDataReady;
+}
+
+void Pdm::setDataReady(bool flag) {
+    _PDMDataReady = flag;
+}
+
 void Pdm::pdm_isr() {
     uint32_t ui32Status;
 
@@ -120,7 +131,7 @@ void Pdm::pdm_isr() {
 }
 
 extern "C" void __attribute__((interrupt)) am_pdm0_isr(void) {
-    Pdm.pdm_isr();
+    Mic.pdm_isr();
 }
 
 Pdm Mic;

@@ -64,6 +64,7 @@ SRC += am_util_stdio.c
 SRC += am_devices_led.c
 SRC += am_util_id.c
 SRC += uart.cpp
+SRC += pdm.cpp
 # for debugging hal
 # SRC += am_hal_adc.c
 # SRC += am_hal_ble.c

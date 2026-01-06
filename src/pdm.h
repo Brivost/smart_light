@@ -10,7 +10,7 @@
 #define PDM_BYTES (PDM_SIZE * 2)
 
 #define PCM_SR 16000
-#define RECORDING_DURATION_SECONDS 3
+#define RECORDING_DURATION_SECONDS 2
 // Multiple of PDM_SIZE to ensure whole number of PDM samples are recorded and we do not write past buffer
 #define PRINT_BUFF_SIZE ((PCM_SR * RECORDING_DURATION_SECONDS / PDM_SIZE) * PDM_SIZE)
 
@@ -24,6 +24,9 @@ class Pdm {
     void reset();
     int getSamplesRecorded();
     int16_t* getPrintBuffer();
+    am_hal_pdm_config_t* getConfig();
+    bool dataIsReady();
+    void setDataReady(bool);
     void pdm_isr();
 
    private:
@@ -34,7 +37,7 @@ class Pdm {
     int32_t _PCMSamplesRecorded{};
     uint32_t _SampleFreq;
     am_hal_pdm_config_t _config;
-}
+};
 
 extern Pdm Mic;
 

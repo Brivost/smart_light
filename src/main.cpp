@@ -69,7 +69,7 @@
 #define PRINT_PDM_DATA 1
 
 #define PCM_SR 16000
-#define RECORDING_DURATION_SECONDS 5
+#define RECORDING_DURATION_SECONDS 3
 // Multiple of PDM_SIZE to ensure whole number of PDM samples are recorded and we do not write past buffer
 #define PRINT_BUFF_SIZE ((PCM_SR * RECORDING_DURATION_SECONDS / PDM_SIZE) * PDM_SIZE)
 
@@ -311,15 +311,27 @@ int main(void) {
     pdm_data_get();
 
     //
-    // Loop forever
+    // Loop forever, recording and printing bursts of audio
     //
-    while (g_PCMSamplesRecorded + PDM_SIZE <= PRINT_BUFF_SIZE) {
-        if (g_bPDMDataReady) {
-            g_bPDMDataReady = false;
+    while (1) {
+        if ((Serial.available()) && (Serial.read() == 'r')) {
+            am_devices_led_on(am_bsp_psLEDs, 0);
+            while (g_PCMSamplesRecorded + PDM_SIZE <= PRINT_BUFF_SIZE) {
+                if (g_bPDMDataReady) {
+                    g_bPDMDataReady = false;
 
-            // Start converting the next set of PCM samples.
-            pdm_data_get();
+                    // Start converting the next set of PCM samples.
+                    pdm_data_get();
+                }
+            }
+            am_devices_led_off(am_bsp_psLEDs, 0);
+
+            // Print PCM data
+            pcm_print_all();
+
+            // Reset PCM buffer
+            g_PCMSamplesRecorded = 0;
+            memset(g_PCMPrintBuffer, 0, sizeof(g_PCMPrintBuffer));
         }
     }
-    pcm_print_all();
 }

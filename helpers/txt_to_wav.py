@@ -10,7 +10,18 @@ def txt_to_wav(txt_path):
     wav_path = txt_path.rsplit(".", 1)[0] + ".wav"
 
     with open(txt_path, "r") as f:
-        samples = [int(line.strip()) for line in f if line.strip()]
+        samples = []
+        skipped_samples = 0
+        for line in f:
+            if line.strip():
+                try:
+                    samples.append(int(line.strip()))
+                except:
+                    # Skip invalid literals
+                    skipped_samples += 1
+                    continue
+        print(f"Samples skipped: {skipped_samples}")
+        # samples = [int(line.strip()) for line in f if line.strip()]
 
     with wave.open(wav_path, "w") as wav:
         wav.setnchannels(1)  # Mono

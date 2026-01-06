@@ -66,7 +66,6 @@
 //*****************************************************************************
 #define PDM_SIZE 4096
 #define PDM_BYTES (PDM_SIZE * 2)
-#define PRINT_PDM_DATA 1
 
 #define PCM_SR 16000
 #define RECORDING_DURATION_SECONDS 3

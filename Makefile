@@ -45,6 +45,9 @@ DEFINES := -DPART_apollo3
 DEFINES += -DAM_PACKAGE_BGA
 DEFINES += -DAM_PART_APOLLO3
 
+# CMSIS-NN Path
+CMSISNN_PATH := external/CMSISNN
+
 # Include Paths
 INCLUDES := -Isrc
 INCLUDES += -I$(BOARDPATH)/bsp
@@ -54,6 +57,7 @@ INCLUDES += -I$(SDKPATH)/devices
 INCLUDES += -I$(SDKPATH)/mcu/apollo3
 INCLUDES += -I$(SDKPATH)/CMSIS/AmbiqMicro/Include
 INCLUDES += -I$(SDKPATH)/CMSIS/ARM/Include
+INCLUDES += -I$(CMSISNN_PATH)/Include
 
 # Source Files
 SRC := main.c
@@ -99,6 +103,22 @@ SRC += uart.cpp
 # SRC += am_hal_uart.c
 # SRC += am_hal_wdt.c
 
+# CMSIS-NN Source Files (auto-discover all .c files from enabled modules)
+CMSISNN_SRC := $(notdir $(wildcard $(CMSISNN_PATH)/Source/NNSupportFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/ActivationFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/BasicMathFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/ConvolutionFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/FullyConnectedFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/PoolingFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/SoftmaxFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/ConcatenationFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/ReshapeFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/SVDFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/LSTMFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/PadFunctions/*.c))
+CMSISNN_SRC += $(notdir $(wildcard $(CMSISNN_PATH)/Source/TransposeFunctions/*.c))
+SRC += $(CMSISNN_SRC)
+
 # Source Paths (VPATH tells make where to find source files)
 VPATH := src
 VPATH += $(SDKPATH)/utils
@@ -106,6 +126,21 @@ VPATH += $(SDKPATH)/devices
 VPATH += $(COMMONPATH)/tools_sfe/templates
 # for debugging hal
 # VPATH += $(SDKPATH)/mcu/apollo3/hal
+
+# CMSIS-NN Source Paths (add/remove modules as needed)
+VPATH += $(CMSISNN_PATH)/Source/NNSupportFunctions
+VPATH += $(CMSISNN_PATH)/Source/ActivationFunctions
+VPATH += $(CMSISNN_PATH)/Source/BasicMathFunctions
+VPATH += $(CMSISNN_PATH)/Source/ConvolutionFunctions
+VPATH += $(CMSISNN_PATH)/Source/FullyConnectedFunctions
+VPATH += $(CMSISNN_PATH)/Source/PoolingFunctions
+VPATH += $(CMSISNN_PATH)/Source/SoftmaxFunctions
+VPATH += $(CMSISNN_PATH)/Source/ConcatenationFunctions
+VPATH += $(CMSISNN_PATH)/Source/ReshapeFunctions
+VPATH += $(CMSISNN_PATH)/Source/SVDFunctions
+VPATH += $(CMSISNN_PATH)/Source/LSTMFunctions
+VPATH += $(CMSISNN_PATH)/Source/PadFunctions
+VPATH += $(CMSISNN_PATH)/Source/TransposeFunctions
 
 # Precompiled Libraries
 LIBS := $(BOARDPATH)/bsp/gcc/bin/libam_bsp.a

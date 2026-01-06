@@ -1,3 +1,6 @@
 [submodule "external/AmbiqSuiteSDK"]
 	path = external/AmbiqSuiteSDK
 	url = https://github.com/sparkfun/AmbiqSuiteSDK.git
+[submodule "external/CMSISNN"]
+	path = external/CMSISNN
+	url = https://github.com/ARM-software/CMSIS-NN.git

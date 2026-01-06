@@ -13,31 +13,22 @@
 #include "am_util.h"
 #include "uart.h"
 
-volatile bool g_led_state = false;
-
 void board_init() {
     am_hal_clkgen_control(AM_HAL_CLKGEN_CONTROL_SYSCLK_MAX, 0);
     am_hal_cachectrl_config(&am_hal_cachectrl_defaults);
     am_hal_cachectrl_enable();
     am_bsp_low_power_init();
     am_hal_interrupt_master_enable();  // Enable interruts master
-}
-
-void led_init() {
-    uint32_t pin = am_bsp_psLEDs[0].ui32GPIONumber;
-    am_hal_gpio_pinconfig(pin, g_AM_HAL_GPIO_OUTPUT);
+    am_hal_gpio_pinconfig(am_bsp_psLEDs[0].ui32GPIONumber, g_AM_HAL_GPIO_OUTPUT);
     am_devices_led_off(am_bsp_psLEDs, 0);
-    g_led_state = false;
 }
 
 void led_on() {
     am_devices_led_on(am_bsp_psLEDs, 0);
-    g_led_state = true;
 }
 
 void led_off() {
     am_devices_led_off(am_bsp_psLEDs, 0);
-    g_led_state = false;
 }
 
 void process_command(const uint8_t data) {
@@ -58,7 +49,6 @@ void process_command(const uint8_t data) {
 
 int main() {
     board_init();
-    led_init();
 
     Serial.begin(115200);
 

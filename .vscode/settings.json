@@ -59,6 +59,7 @@
   "files.associations": {
     "*.py": "python",
     "am_mcu_apollo.h": "c",
-    "am_hal_global.h": "c"
+    "am_hal_global.h": "c",
+    "arm_nnfunctions.h": "c"
   }
 }

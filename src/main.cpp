@@ -36,19 +36,31 @@ int main() {
     board_init();
     Serial.begin(115200);
 
-    constexpr int32_t input_nodes = 3;
-    constexpr int32_t output_nodes = 2;
+    constexpr int32_t input_nodes = 10;
+    constexpr int32_t output_nodes = 15;
 
-    const int8_t input[] = {60, 74, 38};
-    const int8_t kernel[] = {-1, 83, -127, -114, -60, 42};
-    const int32_t bias[] = {0, 0};
+    const int8_t input[] = {104, 80, 84, 70, 88, 48, 38, 4, 16, 91};
+    const int8_t kernel[] = {-1, 69, -105, -94, -49, 34, -3, 101, -11, 34, -39, -25,
+                             -122, -85, -53, 5, 51, 77, -87, -56, 46, 106, -26, 96,
+                             -21, 14, 116, -119, -80, -32, -50, 110, -83, -59, -89, -120,
+                             -75, 110, 57, 62, 7, -66, 22, -119, -92, -66, 81, 75,
+                             -57, -5, 82, 127, 51, 17, 86, -75, 24, -99, -89, -66,
+                             58, 51, -76, 39, 70, -16, 5, 30, 79, 123, -98, -47,
+                             50, 106, 111, 113, 25, -111, 12, -80, -119, 114, 97, -128,
+                             24, -22, -21, -59, 49, -76, 47, 65, 91, 48, -127, -83,
+                             64, 27, -100, -74, 120, 86, -56, -32, -122, -2, -96, -99,
+                             -7, 19, -52, 76, -78, 116, 88, -108, -32, 6, 19, 30,
+                             50, 8, -62, 60, -123, -76, -32, -62, -45, -105, -27, 27,
+                             -83, -7, 91, -13, 4, -11, 26, 81, 121, 81, 121, -9,
+                             -115, -61, 87, -1, -64, -98};
+    const int32_t bias[output_nodes] = {};
     int8_t output[output_nodes] = {};
 
     void *ctx_buff;
     const cmsis_nn_context ctx{.buf = ctx_buff, .size = 0};
     cmsis_nn_activation activation{.min = -128, .max = 127};
     const cmsis_nn_fc_params fc_params{.input_offset = 0, .filter_offset = 0, .output_offset = 0, activation = activation};
-    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = 13372818, .shift = 0};
+    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = 6485986, .shift = 0};
     const cmsis_nn_dims input_dims{.n = 1};
     const cmsis_nn_dims filter_dims{.n = input_nodes, .c = output_nodes};
     const cmsis_nn_dims bias_dims{.c = output_nodes};

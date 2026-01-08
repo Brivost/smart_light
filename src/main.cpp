@@ -39,7 +39,7 @@ int main() {
     constexpr int32_t input_nodes = 10;
     constexpr int32_t output_nodes = 15;
 
-    const int8_t input[] = {104, 80, 84, 70, 88, 48, 38, 4, 16, 91};
+    const int8_t input[] = {98, 38, 117, 20, 10, 35, 74, 122, 33, 87};
     const int8_t kernel[] = {-1, 69, -105, -94, -49, 34, -3, 101, -11, 34, -39, -25,
                              -122, -85, -53, 5, 51, 77, -87, -56, 46, 106, -26, 96,
                              -21, 14, 116, -119, -80, -32, -50, 110, -83, -59, -89, -120,
@@ -53,14 +53,15 @@ int main() {
                              50, 8, -62, 60, -123, -76, -32, -62, -45, -105, -27, 27,
                              -83, -7, 91, -13, 4, -11, 26, 81, 121, 81, 121, -9,
                              -115, -61, 87, -1, -64, -98};
-    const int32_t bias[output_nodes] = {};
+    const int32_t bias[output_nodes] = {-15254, -13757, -3306, 8939, 8812, -15719, 10167, -12754, -3446,
+                                        -6609, -3139, -3200, -14626, -14073, -2550};
     int8_t output[output_nodes] = {};
 
     void *ctx_buff;
     const cmsis_nn_context ctx{.buf = ctx_buff, .size = 0};
     cmsis_nn_activation activation{.min = -128, .max = 127};
     const cmsis_nn_fc_params fc_params{.input_offset = 0, .filter_offset = 0, .output_offset = 0, activation = activation};
-    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = 6485986, .shift = 0};
+    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = 4817036, .shift = 0};
     const cmsis_nn_dims input_dims{.n = 1};
     const cmsis_nn_dims filter_dims{.n = input_nodes, .c = output_nodes};
     const cmsis_nn_dims bias_dims{.c = output_nodes};

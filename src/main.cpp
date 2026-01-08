@@ -12,6 +12,7 @@
 #include "am_mcu_apollo.h"
 #include "am_util.h"
 #include "arm_nnfunctions.h"
+#include "layers.h"
 #include "uart.h"
 
 void board_init() {
@@ -32,14 +33,21 @@ void led_off() {
     am_devices_led_off(am_bsp_psLEDs, 0);
 }
 
+void print_linear_output(int8_t *output, int32_t output_nodes) {
+    for (int i = 0; i < output_nodes; ++i) {
+        Serial.printf("%d, ", output[i]);
+    }
+}
+
 int main() {
     board_init();
     Serial.begin(115200);
 
     constexpr int32_t input_nodes = 10;
     constexpr int32_t output_nodes = 15;
+    int32_t multiplier = 4817036;
 
-    const int8_t input[] = {98, 38, 117, 20, 10, 35, 74, 122, 33, 87};
+    int8_t input[] = {98, 38, 117, 20, 10, 35, 74, 122, 33, 87};
     const int8_t kernel[] = {-1, 69, -105, -94, -49, 34, -3, 101, -11, 34, -39, -25,
                              -122, -85, -53, 5, 51, 77, -87, -56, 46, 106, -26, 96,
                              -21, 14, 116, -119, -80, -32, -50, 110, -83, -59, -89, -120,
@@ -61,19 +69,26 @@ int main() {
     const cmsis_nn_context ctx{.buf = ctx_buff, .size = 0};
     cmsis_nn_activation activation{.min = -128, .max = 127};
     const cmsis_nn_fc_params fc_params{.input_offset = 0, .filter_offset = 0, .output_offset = 0, activation = activation};
-    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = 4817036, .shift = 0};
+    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = multiplier, .shift = 0};
     const cmsis_nn_dims input_dims{.n = 1};
     const cmsis_nn_dims filter_dims{.n = input_nodes, .c = output_nodes};
     const cmsis_nn_dims bias_dims{.c = output_nodes};
     const cmsis_nn_dims output_dims{.c = output_nodes};
-
     arm_fully_connected_s8(&ctx, &fc_params, &quant_params, &input_dims, input, &filter_dims, kernel, &bias_dims, bias, &output_dims, output);
 
-    Serial.printf("\n");
-    for (int i = 0; i < output_nodes; ++i) {
-        Serial.printf("%d, ", output[i]);
-    }
-    Serial.printf("\n");
+    Serial.printf("\nManual version:\n");
+    print_linear_output(output, output_nodes);
+
+    LinearLayer layer = {
+        .mult = multiplier,
+        .input_nodes = input_nodes,
+        .output_nodes = output_nodes,
+        .weight = kernel,
+        .bias = bias};
+    Linear(&layer, input, output);
+
+    Serial.printf("\nFunction version:\n");
+    print_linear_output(output, output_nodes);
 
     while (1) {
     }

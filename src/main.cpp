@@ -43,52 +43,42 @@ int main() {
     board_init();
     Serial.begin(115200);
 
-    constexpr int32_t input_nodes = 10;
-    constexpr int32_t output_nodes = 15;
-    int32_t multiplier = 4817036;
-
-    int8_t input[] = {98, 38, 117, 20, 10, 35, 74, 122, 33, 87};
-    const int8_t kernel[] = {-1, 69, -105, -94, -49, 34, -3, 101, -11, 34, -39, -25,
-                             -122, -85, -53, 5, 51, 77, -87, -56, 46, 106, -26, 96,
-                             -21, 14, 116, -119, -80, -32, -50, 110, -83, -59, -89, -120,
-                             -75, 110, 57, 62, 7, -66, 22, -119, -92, -66, 81, 75,
-                             -57, -5, 82, 127, 51, 17, 86, -75, 24, -99, -89, -66,
-                             58, 51, -76, 39, 70, -16, 5, 30, 79, 123, -98, -47,
-                             50, 106, 111, 113, 25, -111, 12, -80, -119, 114, 97, -128,
-                             24, -22, -21, -59, 49, -76, 47, 65, 91, 48, -127, -83,
-                             64, 27, -100, -74, 120, 86, -56, -32, -122, -2, -96, -99,
-                             -7, 19, -52, 76, -78, 116, 88, -108, -32, 6, 19, 30,
-                             50, 8, -62, 60, -123, -76, -32, -62, -45, -105, -27, 27,
-                             -83, -7, 91, -13, 4, -11, 26, 81, 121, 81, 121, -9,
-                             -115, -61, 87, -1, -64, -98};
-    const int32_t bias[output_nodes] = {-15254, -13757, -3306, 8939, 8812, -15719, 10167, -12754, -3446,
-                                        -6609, -3139, -3200, -14626, -14073, -2550};
-    int8_t output[output_nodes] = {};
-
-    void *ctx_buff;
-    const cmsis_nn_context ctx{.buf = ctx_buff, .size = 0};
+    constexpr int32_t input_channels{1};
+    constexpr int32_t output_channels{1};
+    constexpr int32_t input_width{3};
+    constexpr int32_t input_height{3};
+    constexpr int32_t output_width{input_width};
+    constexpr int32_t output_height{input_height};
+    constexpr int32_t kernel_width{3};
+    constexpr int32_t kernel_height{3};
+    cmsis_nn_tile stride{.w = 1, .h = 1};
+    cmsis_nn_tile padding{.w = 1, .h = 1};
+    cmsis_nn_tile dilation{.w = 1, .h = 1};
     cmsis_nn_activation activation{.min = -128, .max = 127};
-    const cmsis_nn_fc_params fc_params{.input_offset = 0, .filter_offset = 0, .output_offset = 0, activation = activation};
-    const cmsis_nn_per_tensor_quant_params quant_params{.multiplier = multiplier, .shift = 0};
-    const cmsis_nn_dims input_dims{.n = 1};
-    const cmsis_nn_dims filter_dims{.n = input_nodes, .c = output_nodes};
-    const cmsis_nn_dims bias_dims{.c = output_nodes};
-    const cmsis_nn_dims output_dims{.c = output_nodes};
-    arm_fully_connected_s8(&ctx, &fc_params, &quant_params, &input_dims, input, &filter_dims, kernel, &bias_dims, bias, &output_dims, output);
+    int32_t mults[output_channels];
+    for (int i{}; i < output_channels; ++i) {
+        mults[i] = 10893229;
+    }
+    int32_t shift[output_channels];
+    int8_t input_data[] = {75, 91, 89, 56, 12, 54, 86, 41, 88};
+    const int8_t filter_data[] = {-1, 83, -128, -114, -60, 42, -3, 123, -14};
+    const int32_t bias_data[output_channels]{};
+    int8_t output_data[output_channels * output_width * output_height];
 
-    Serial.printf("\nManual version:\n");
-    print_linear_output(output, output_nodes);
+    const cmsis_nn_dims input_dims{.n = 1, .h = input_height, .w = input_width, .c = input_channels};
+    const cmsis_nn_dims filter_dims{.n = output_channels, .h = kernel_height, .w = kernel_width, .c = input_channels};
+    int32_t size = arm_convolve_s8_get_buffer_size(&input_dims, &filter_dims);
+    int16_t buf[size];
+    const cmsis_nn_context ctx{.buf = buf, .size = size};
+    const cmsis_nn_conv_params conv_params{.input_offset = 0, .output_offset = 0, .stride = stride, .padding = padding, .dilation = dilation, .activation = activation};
+    const cmsis_nn_per_channel_quant_params quant_params{.multiplier = mults, .shift = shift};
+    const cmsis_nn_dims bias_dims{};
+    const cmsis_nn_dims upscale_dims{};
+    const cmsis_nn_dims output_dims{.h = output_height, .w = output_width, .c = output_channels};
 
-    LinearLayer layer = {
-        .mult = multiplier,
-        .input_nodes = input_nodes,
-        .output_nodes = output_nodes,
-        .weight = kernel,
-        .bias = bias};
-    Linear(&layer, input, output);
+    arm_convolve_s8(&ctx, &conv_params, &quant_params, &input_dims, input_data, &filter_dims, filter_data, &bias_dims, bias_data, &upscale_dims, &output_dims, output_data);
 
-    Serial.printf("\nFunction version:\n");
-    print_linear_output(output, output_nodes);
+    print_linear_output(output_data, output_channels * output_width * output_height);
 
     while (1) {
     }

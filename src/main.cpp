@@ -57,15 +57,15 @@ int main() {
     cmsis_nn_activation activation{.min = -128, .max = 127};
     int32_t mults[output_channels];
     for (int i{}; i < output_channels; ++i) {
-        mults[i] = 5315931;
+        mults[i] = 4653124;
     }
     int32_t shift[output_channels];
-    int8_t input_data[] = {13, 122, 48, 33, 98, 87, 38, 48, 117, 50, 20, 111, 10, 14,
-                           35, 71, 74, 124};
+    int8_t input_data[] = {117, 50, 20, 111, 10, 14, 35, 71, 74, 124, 122, 55, 33, 113,
+                           87, 44, 48, 115};
     const int8_t filter_data[] = {-1, 35, 72, -40, -110, -26, -98, -128, -51, -88, 36, -55,
                                   -3, 5, 106, 53, -12, 80, -90, -124, -58, -84, 48, -34,
                                   111, -52, -27, 115, 100, -87, -22, -61, 14, -93, 121, -125};
-    const int32_t bias_data[output_channels]{};
+    const int32_t bias_data[output_channels]{-9935, 14629};
     int8_t output_data[output_channels * output_width * output_height];
 
     const cmsis_nn_dims input_dims{.n = 1, .h = input_height, .w = input_width, .c = input_channels};

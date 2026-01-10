@@ -45,23 +45,25 @@ int main() {
 
     constexpr int32_t input_channels{2};
     constexpr int32_t output_channels{2};
-    constexpr int32_t input_width{3};
-    constexpr int32_t input_height{3};
-    constexpr int32_t output_width{input_width};
-    constexpr int32_t output_height{input_height};
+    constexpr int32_t input_width{5};
+    constexpr int32_t input_height{5};
+    constexpr int32_t output_width{3};
+    constexpr int32_t output_height{3};
     constexpr int32_t kernel_width{3};
     constexpr int32_t kernel_height{3};
-    cmsis_nn_tile stride{.w = 1, .h = 1};
+    cmsis_nn_tile stride{.w = 2, .h = 2};
     cmsis_nn_tile padding{.w = 1, .h = 1};
     cmsis_nn_tile dilation{.w = 1, .h = 1};
     cmsis_nn_activation activation{.min = -128, .max = 127};
     int32_t mults[output_channels];
     for (int i{}; i < output_channels; ++i) {
-        mults[i] = 4653124;
+        mults[i] = 4905372;
     }
     int32_t shift[output_channels];
-    int8_t input_data[] = {117, 50, 20, 111, 10, 14, 35, 71, 74, 124, 122, 55, 33, 113,
-                           87, 44, 48, 115};
+    int8_t input_data[] = {125, 8, 39, 95, 7, 39, 33, 41, 5, 13, 116, 90, 35, 17,
+                           19, 50, 57, 92, 21, 112, 30, 78, 96, 40, 16, 36, 94, 100,
+                           110, 76, 64, 117, 92, 88, 28, 115, 113, 12, 126, 115, 79, 34,
+                           122, 47, 0, 64, 57, 52, 76, 76};
     const int8_t filter_data[] = {-1, 35, 72, -40, -110, -26, -98, -128, -51, -88, 36, -55,
                                   -3, 5, 106, 53, -12, 80, -90, -124, -58, -84, 48, -34,
                                   111, -52, -27, 115, 100, -87, -22, -61, 14, -93, 121, -125};

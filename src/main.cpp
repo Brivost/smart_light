@@ -43,8 +43,8 @@ int main() {
     board_init();
     Serial.begin(115200);
 
-    constexpr int32_t input_channels{1};
-    constexpr int32_t output_channels{1};
+    constexpr int32_t input_channels{2};
+    constexpr int32_t output_channels{2};
     constexpr int32_t input_width{3};
     constexpr int32_t input_height{3};
     constexpr int32_t output_width{input_width};
@@ -57,11 +57,14 @@ int main() {
     cmsis_nn_activation activation{.min = -128, .max = 127};
     int32_t mults[output_channels];
     for (int i{}; i < output_channels; ++i) {
-        mults[i] = 10893229;
+        mults[i] = 5315931;
     }
     int32_t shift[output_channels];
-    int8_t input_data[] = {75, 91, 89, 56, 12, 54, 86, 41, 88};
-    const int8_t filter_data[] = {-1, 83, -128, -114, -60, 42, -3, 123, -14};
+    int8_t input_data[] = {13, 122, 48, 33, 98, 87, 38, 48, 117, 50, 20, 111, 10, 14,
+                           35, 71, 74, 124};
+    const int8_t filter_data[] = {-1, 35, 72, -40, -110, -26, -98, -128, -51, -88, 36, -55,
+                                  -3, 5, 106, 53, -12, 80, -90, -124, -58, -84, 48, -34,
+                                  111, -52, -27, 115, 100, -87, -22, -61, 14, -93, 121, -125};
     const int32_t bias_data[output_channels]{};
     int8_t output_data[output_channels * output_width * output_height];
 

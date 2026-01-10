@@ -5,7 +5,6 @@
       "includePath": [
         "${workspaceFolder}/**"
       ],
-      // from Makefile defines
       "defines": [
         "PART_apollo3",
         "AM_PACKAGE_BGA",

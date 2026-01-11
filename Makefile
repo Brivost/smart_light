@@ -171,7 +171,7 @@ COMMON_FLAGS += $(INCLUDES)
 CFLAGS := $(COMMON_FLAGS) -std=c99
 
 # C++ Compiler Flags
-CXXFLAGS := $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti
+CXXFLAGS := $(COMMON_FLAGS) -std=c++20 -fno-exceptions -fno-rtti
 
 # Linker Script
 LINKER_SCRIPT := $(COMMONPATH)/tools_sfe/templates/asb_svl_linker.ld

@@ -49,15 +49,19 @@ int main() {
     constexpr int32_t input_height{5};
     constexpr int32_t output_width{3};
     constexpr int32_t output_height{3};
-    constexpr int32_t kernel_width{3};
-    constexpr int32_t kernel_height{3};
-    cmsis_nn_tile stride{.w = 2, .h = 2};
-    cmsis_nn_tile padding{.w = 1, .h = 1};
-    cmsis_nn_tile dilation{.w = 1, .h = 1};
+    constexpr int32_t kernel_size{3};
+    constexpr int32_t stride{2};
+    constexpr int32_t padding{1};
+    constexpr int32_t dilation{1};
+    constexpr int32_t mult{4905372};
+
+    cmsis_nn_tile strides{.w = stride, .h = stride};
+    cmsis_nn_tile paddings{.w = padding, .h = padding};
+    cmsis_nn_tile dilations{.w = dilation, .h = dilation};
     cmsis_nn_activation activation{.min = -128, .max = 127};
     int32_t mults[output_channels];
     for (int i{}; i < output_channels; ++i) {
-        mults[i] = 4905372;
+        mults[i] = mult;
     }
     int32_t shift[output_channels];
     int8_t input_data[] = {125, 8, 39, 95, 7, 39, 33, 41, 5, 13, 116, 90, 35, 17,
@@ -71,11 +75,11 @@ int main() {
     int8_t output_data[output_channels * output_width * output_height];
 
     const cmsis_nn_dims input_dims{.n = 1, .h = input_height, .w = input_width, .c = input_channels};
-    const cmsis_nn_dims filter_dims{.n = output_channels, .h = kernel_height, .w = kernel_width, .c = input_channels};
+    const cmsis_nn_dims filter_dims{.n = output_channels, .h = kernel_size, .w = kernel_size, .c = input_channels};
     int32_t size = arm_convolve_s8_get_buffer_size(&input_dims, &filter_dims);
     int16_t buf[size];
     const cmsis_nn_context ctx{.buf = buf, .size = size};
-    const cmsis_nn_conv_params conv_params{.input_offset = 0, .output_offset = 0, .stride = stride, .padding = padding, .dilation = dilation, .activation = activation};
+    const cmsis_nn_conv_params conv_params{.input_offset = 0, .output_offset = 0, .stride = strides, .padding = paddings, .dilation = dilations, .activation = activation};
     const cmsis_nn_per_channel_quant_params quant_params{.multiplier = mults, .shift = shift};
     const cmsis_nn_dims bias_dims{};
     const cmsis_nn_dims upscale_dims{};
@@ -83,6 +87,30 @@ int main() {
 
     arm_convolve_s8(&ctx, &conv_params, &quant_params, &input_dims, input_data, &filter_dims, filter_data, &bias_dims, bias_data, &upscale_dims, &output_dims, output_data);
 
+    Serial.printf("\nManual version:\n");
+    print_linear_output(output_data, output_channels * output_width * output_height);
+
+    ConvLayer layer{
+        .act_min = -128,
+        .act_max = 127,
+        .input_channels = input_channels,
+        .output_channels = output_channels,
+        .input_width = input_width,
+        .input_height = input_height,
+        .output_width = output_width,
+        .output_height = output_height,
+        .kernel_size = kernel_size,
+        .stride = stride,
+        .padding = padding,
+        .dilation = dilation,
+        .mult = mult,
+        .weight = filter_data,
+        .bias = bias_data,
+    };
+
+    Conv(&layer, input_data, output_data);
+
+    Serial.printf("\nFunction version:\n");
     print_linear_output(output_data, output_channels * output_width * output_height);
 
     while (1) {
